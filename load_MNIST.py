@@ -3,7 +3,7 @@ import gzip
 from pathlib import Path
 import requests
 
-def load_MNIST():
+def load_mnist():
     DATA_PATH = Path("data")
     PATH = DATA_PATH / "mnist"
 

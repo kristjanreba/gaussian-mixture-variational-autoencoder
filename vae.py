@@ -9,7 +9,7 @@ from torch import optim
 from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 
-from load_MNIST import load_MNIST
+from load_mnist import load_mnist
 
 
 def plot_results(x_train, results):
@@ -24,21 +24,26 @@ def plot_results(x_train, results):
 
 
 class VAE(nn.Module):
+
     def __init__(self):
         super(VAE, self).__init__()
-        self.encoder = nn.Sequential(
-            nn.Linear(D_in, 128), nn.ReLU(True),
-            nn.Linear(128, 64), nn.ReLU(True),
-            nn.Linear(64, 12), nn.ReLU(True))
 
-        self.enc_mu = torch.nn.Linear(12,10)
-        self.enc_log_sigma = torch.nn.Linear(12,10)
+        D_in = 28*28
+        H_1 = 128
+        H_2 = 64
+        H_z = 10
+
+        self.encoder = nn.Sequential(
+            nn.Linear(D_in, H_1), nn.ReLU(True),
+            nn.Linear(H_1, H_2), nn.ReLU(True))
+
+        self.enc_mu = torch.nn.Linear(H_2, H_z)
+        self.enc_log_sigma = torch.nn.Linear(H_2, H_z)
 
         self.decoder = nn.Sequential(
-            nn.Linear(10, 12), nn.ReLU(True),
-            nn.Linear(12, 64), nn.ReLU(True),
-            nn.Linear(64, 128), nn.ReLU(True),
-            nn.Linear(128, D_in), nn.Tanh())
+            nn.Linear(H_z, H_2), nn.ReLU(True),
+            nn.Linear(H_2, H_1), nn.ReLU(True),
+            nn.Linear(H_1, D_in), nn.Tanh())
 
     def sample_latent(self, x_enc):
         '''
@@ -104,7 +109,7 @@ def get_data(x_train, y_train, x_valid, y_valid, bs, shuffle=False):
     return train_dl, valid_dl
 
 
-x_train, y_train, x_valid, y_valid = load_MNIST()
+x_train, y_train, x_valid, y_valid = load_mnist()
 x_train, y_train, x_valid, y_valid = map(torch.FloatTensor, (x_train, y_train, x_valid, y_valid))
 
 #plt.imshow(x_train[0].reshape((28, 28)), cmap="gray")
